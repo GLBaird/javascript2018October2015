@@ -1,5 +1,68 @@
-function PersonForm() {
+function PersonForm(element) {
+    if (typeof  element === "object") {
+        this.formElement = element;
+    } else if (typeof element === "string") {
+        this.formElement = document.getElementById(element);
+    } else {
+        throw new Error("element should be a string or HTMLElement");
+    }
 
+    if (this.formElement == null) {
+        throw new Error("element must not be null or you must have an element with id");
+    }
+
+    // build the form
+    var form = document.createElement("form");
+
+    // make input elements
+    this._surnameInput = document.createElement("input");
+    this._surnameInput.placeholder = "Enter surname";
+    this._forenameInput = document.createElement("input");
+    this._forenameInput.placeholder = "Enter forename";
+
+    form.appendChild( this._surnameInput );
+    form.appendChild( document.createElement("br") );
+    form.appendChild( this._forenameInput );
+    form.appendChild( document.createElement("br") );
+
+    var resetButton = document.createElement("input");
+    resetButton.type = "reset";
+    resetButton.value = "Clear";
+
+    var submitButton = document.createElement("input");
+    submitButton.type = "submit";
+    submitButton.value = "Save";
+
+    form.appendChild(resetButton);
+    form.appendChild(submitButton);
+
+    // add form to page
+    this.formElement.innerHTML = "";
+    this.formElement.appendChild(form);
+
+    // listen for form being submitted
+    function handleFormSubmit(e) {
+        e.preventDefault();
+
+        // check data is valid!
+        this._surnameInput.style.background = this.getSurname() === "" ? "red" : "";
+        this._forenameInput.style.background = this.getForename() === "" ? "red" : "";
+
+        if (this.getForename() === "" || this.getSurname() === "") {
+            alert("You need to complete the form!");
+            return;
+        }
+
+        // check callback is a function and pass details on
+        if ( typeof this.onformsave === "function" ) {
+            this.onformsave({ surname: this.getSurname(), forename: this.getForename() });
+            this.setForename("");
+            this.setSurname("");
+        } else {
+            console.warn("You should have an event handler for this form submission");
+        }
+    }
+    this.formElement.addEventListener("submit", handleFormSubmit.bind(this));
 }
 
 /**
@@ -16,14 +79,14 @@ PersonForm.prototype.onformsave = null;
 
 /**
  * HTMLElement for <input surname>
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * @private
  */
 PersonForm.prototype._surnameInput = null;
 
 /**
  * HTMLElement for <input forename>
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * @private
  */
 PersonForm.prototype._forenameInput = null;

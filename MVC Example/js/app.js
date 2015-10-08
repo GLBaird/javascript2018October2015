@@ -9,12 +9,29 @@ var app = {
         this.ui.setupUI();
 
         // detect window closing and save data
-        window.addEventListener("beforeunload", this.dataController.saveData);
+        window.addEventListener("beforeunload", this.dataController.saveData.bind(this.dataController));
     },
 
     ui: {
+
+        formView: null,
+        listView: null,
+
         setupUI: function() {
             console.log("Setting up user interface...");
+
+            // make form view
+            this.formView = new PersonForm("detailsForm");
+            this.formView.onformsave = this.saveNewUser.bind(this);
+
+            // make list view
+            this.listView = new PersonList("detailsList", app.dataController.people);
+        },
+
+        saveNewUser: function(details) {
+            var newPerson = new Person(details.surname, details.forename);
+            app.dataController.addPerson(newPerson);
+            this.listView.updateList(app.dataController.people);
         }
     },
 
@@ -28,7 +45,11 @@ var app = {
 
         saveData: function() {
             if (typeof Storage !== "undefined") {
-                localStorage.data = JSON.stringify( this.people );
+                // map data for storage
+                var data = this.people.map(function(person) {
+                    return person.modelData();
+                });
+                localStorage.data = JSON.stringify( data );
                 console.log("Data saved");
             } else {
                 console.log("Local Storage Not Available!");
@@ -37,8 +58,16 @@ var app = {
 
         loadData: function() {
             if (typeof  Storage !== "undefined" && localStorage.data) {
-                this.people = JSON.parse( localStorage.data );
-                console.log("Data loaded from Local Storage");
+                try {
+                    var data = JSON.parse(localStorage.data);
+                    this.people = data.map(function(personData) {
+                        return new Person(personData);
+                    });
+                    console.log("Data loaded from Local Storage");
+                } catch(e) {
+                    console.warn("Problem loading local data - resetting!");
+                    localStorage.data = "[]";
+                }
             } else {
                 console.log("Local Storage or Data not available");
             }
