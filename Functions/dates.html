@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dates</title>
+</head>
+<body>
+
+    <script type="text/javascript">
+        // Helper methods for unix timestamps
+        Date.prototype.getUnixTimestamp = function() {
+            return Math.round( this.getTime() / 1000 );
+        };
+
+        Date.getDateFromUnixTimestamp = function(timestamp) {
+            return new Date(timestamp * 1000);
+        }
+
+        // add 1 day to current date
+        var tomorrow = new Date();
+        tomorrow.setDate( tomorrow.getDate() + 1 );
+
+    </script>
+
+</body>
+</html>

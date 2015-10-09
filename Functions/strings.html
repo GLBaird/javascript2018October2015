@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strings</title>
+</head>
+<body>
+
+    <script type="text/javascript">
+
+        var data = "http://evil.com?user=leon%20baird&id=293948458&department=London%20Bridge";
+
+        // Challenge - convert into a clean JSON object!!
+
+        // method 1 get with index and substring
+
+        var urlEncodedVariablesMethod1 = data.substr( data.indexOf("?") +1 );
+
+        // method 2 get with split
+
+        var urlEncodedVariablesMethod2 = data.split("?")[1];
+
+        // convert to array of objects
+        var convertedData = data.split("?")[1].split("&").map(function(value, index, theArray) {
+            var splitData = value.split("=");
+            var data = {};
+            data[splitData[0]] = splitData[1].replace("%20", " ");
+            return data;
+        });
+
+        // Get array of individual values
+
+        var values = data.split("?")[1].split("&");
+        var jsonData = {};
+        values.forEach(function(value) {
+            var splitData = value.split("=");
+            jsonData[splitData[0]] = decodeURI( splitData[1] );
+        });
+
+        console.log(results);
+
+
+    </script>
+
+    <!-- Regex Email pattern -->
+
+    <script type="text/javascript">
+
+        function validateForm(e) {
+            e.preventDefault();
+
+            var emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+            var email = document.getElementById("emailAddress").value;
+
+            document.getElementById("result").innerHTML = emailPattern.test(email) ? "Good" : "Bad";
+        }
+
+    </script>
+
+    <form onsubmit="validateForm(event)">
+        <input type="text" id="emailAddress" placeholder="Enter email address">
+        <input type="submit" value="Test">
+    </form>
+    <p id="result"> </p>
+
+</body>
+</html>
